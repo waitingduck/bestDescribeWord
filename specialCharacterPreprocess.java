@@ -1,9 +1,7 @@
-package brightedge_assignment;
-
 import java.util.HashSet;
 import java.util.Set;
 
-public class specialCharacterPreprocess implements contentProcess{
+public class SpecialCharacterPreprocess implements ContentPreprocess{
 
 	//Remove special character.
 	@Override

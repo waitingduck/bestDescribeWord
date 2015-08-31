@@ -1,9 +1,9 @@
-package brightedge_assignment;
 
-public class periodPreprocess implements contentProcess{
+
+public class PeriodPreprocess implements ContentPreprocess{
 
 	//To preprocess period. Replace period that come with a space to space. For example, “time. “ 
-	//will become “time  ”,”Amazon.com” will still be “Amazon.com”
+	//will become “time  �?,�?Amazon.com�? will still be “Amazon.com�?
 	@Override
 	public String preprocess(String text) {
 		StringBuilder sb = new StringBuilder(text);

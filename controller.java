@@ -1,41 +1,29 @@
-package brightedge_assignment;
-
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JTextArea;
+
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class controller {
-	public static void main(String Args[]){
+
+public class Controller {
+	public void start(String URL, JTextArea resultText, JTextArea topText){
 		
-		if(Args.length==0){
+		if(URL.length()==0){
 			System.out.println("No input detected.");
-			System.exit(0);
+			resultText.append("No input detected.");
 		}
 		//process input
-		String URL=Args[0];
 		Double threshold = 0.85;
-		if(Args.length==2){
-			try{
-				threshold = Double.parseDouble(Args[1]);
-			}catch(Exception e){
-				System.out.println("Second parameter is not double, threshold will use default setting.");
-			}	
-		}
-		if(threshold<0.0 || threshold>1.0){
-			System.out.println("Second parameter is not in the rage of [0.0, 1.0], threshold will use default setting.");
-			threshold = 0.9;
-		}
+		
 		if(URL.equals("test")){
 			test t = new test();
-			t.toTest();
-			System.exit(0);
+			t.toTest(resultText);
 		}
 		
 		//This part will crawl the whole page content
-		crawler c = new crawler();
+		Crawler c = new Crawler();
 		HtmlPage page = null;
 		try{
 			page = c.getPage(URL);
@@ -44,33 +32,31 @@ public class controller {
 		}
 		
 		//pre-process the title and content.
-		preprocess pp = new preprocess();
+		Preprocess pp = new Preprocess();
 		String title = pp.preprocess(c.getTitle(page));
-		String content = pp.preprocess(c.getContent(page));
 		
+		String content = pp.preprocess(c.getContent(page));
 		//After pre-process, we split the content to array.For the combination of some word, I chose the substring which appear in the subset to title.
 		//split text
 		List<String> title_word_list = Arrays.asList(title.split(" "));		
 		List<String> content_word_list = Arrays.asList(content.split(" "));
 
 		
-		toolFunction tf = new toolFunction();
+		ToolFunction tf = new ToolFunction();
 		//find subset
 		List<String> title_subset = tf.findSubSet(title_word_list);
         
 		HashMap<String,Double> word_score = tf.generateWordScore(content_word_list, title_subset, title);
 		
 		//prioritize word_score
-        prioritize p = new prioritize();
+        Prioritize p = new Prioritize();
         p.prioritize(word_score, title_subset);
         
         //get result
 		System.out.println("Words that best describe the article:");
-		resultProcess rp = new resultProcess1();
-		rp.setThreshold(threshold);
-		List<String> result = rp.getResult(word_score);
-		for(String r:result){
-        	System.out.println(r);
-        }
+		
+		ResultProcess1 rp = new ResultProcess1(threshold);
+		
+		rp.getResult(word_score, resultText, topText);
 	}
 }

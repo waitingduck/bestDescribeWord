@@ -1,21 +1,27 @@
-package brightedge_assignment;
-
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
+
+import javax.swing.JTextArea;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+
+
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+
 public class test {
-	
 	@Test
-	public void toTest(){
+	public void toTest(JTextArea result){
 		System.out.println("Testing...");
 		//test is crawler work correctly
 		try (final WebClient webClient = new WebClient(BrowserVersion.CHROME)) {
@@ -33,25 +39,30 @@ public class test {
 	    	e.printStackTrace();
 	    }
 		System.out.println("Web crawler works correctly");
+		result.append("Web crawler works correctly\n\n");
 		
 		//test pre-process work correctly
-		contentProcess cp = null;
-		cp = new casePreprocess();
+		ContentPreprocess cp = null;
+		cp = new CasePreprocess();
 		Assert.assertEquals("it is a test.", cp.preprocess("It is a TEST."));
+		result.append("CasePreprocess work correctly\n");
 		
-		cp = new periodPreprocess();
+		cp = new PeriodPreprocess();
 		Assert.assertEquals("time ", cp.preprocess("time."));
 		Assert.assertEquals("waitingduck.com", cp.preprocess("waitingduck.com"));
+		result.append("PeriodPreprocess work correctly\n");
 		
-		cp = new spacePreprocess();
+		cp = new SpacePreprocess();
 		Assert.assertEquals("it is a test.", cp.preprocess("it      is a     test."));
+		result.append("CasePreprocess work correctly\n");
 		
-		cp = new specialCharacterPreprocess();
+		cp = new SpecialCharacterPreprocess();
 		Assert.assertEquals("it is a test             ", cp.preprocess("it is a test(){}[]!@#%^;:"));
 		System.out.println("Preprocess works correctly");
-		
+		result.append("SpecialCharacterPreprocess work correctly\n");
+		result.append("Preprocess works correctly\n\n");
 		//test prioritizer work correctly
-		prioritizeProcess pp = null;
+		PrioritizeProcess pp = null;
 		HashMap<String,Double> temp = new HashMap<String,Double>();
 		temp.put("2015", 1.0);
 		temp.put("8", 1.0);
@@ -62,26 +73,43 @@ public class test {
 		
 		List<String> temp_title = new ArrayList<String>();
 		temp_title.add("test");
+		List<String> umimportantDict = new ArrayList<String>();
+		try {
+			Scanner txtReader = new Scanner(new File("src\\dict\\umimportant.txt"));
+			while(txtReader.hasNextLine()){
+				umimportantDict.add(txtReader.nextLine());
+			}
+			txtReader.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		pp = new numberPrioritizer();
+		pp = new NumberPrioritize();
 		pp.setExtraScore(2.0);
 		pp.prioritize(temp, null);
 		Assert.assertEquals(0.0,temp.get("8"),0.0);
 		Assert.assertEquals(2.0,temp.get("2015"),0.0);
+		result.append("NumberPrioritize work correctly\n");
 		
-		pp = new titlePrioritizer();
+		pp = new TitlePrioritize();
 		pp.setExtraScore(2.0);
 		pp.prioritize(temp, temp_title);
 		Assert.assertEquals(2.0,temp.get("test"),0.0);
 		Assert.assertEquals(1.0,temp.get("not test"),0.0);
+		result.append("TitlePrioritize work correctly\n");
 		
-		pp = new importantWordPrioritizer();
+		pp = new ImportantWordPrioritize();
 		pp.setExtraScore(2.0);
-	    pp.prioritize(temp, null);
+	    pp.prioritize(temp, umimportantDict);
 	    Assert.assertEquals(0.0,temp.get("to"),0.0);
 		Assert.assertEquals(3.0,temp.get("important"),0.0);
 		System.out.println("Prioritizer works correctly");
-		System.out.println("Pass all unit test");
+		result.append("ImportantWordPrioritize work correctly\n");
+		
+		result.append("Prioritizer works correctly\n\n");
+		System.out.println("Pass all unit test\n");
+		result.append("Pass all unit test\n");
 		
 	}
 }

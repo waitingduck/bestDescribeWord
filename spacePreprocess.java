@@ -1,10 +1,9 @@
-package brightedge_assignment;
 
-public class spacePreprocess implements contentProcess{
+public class SpacePreprocess implements ContentPreprocess{
 	//remove extra space.
 	@Override
 	public String preprocess(String text) {
 		return text.replaceAll("\\s+", " ");
 	}
-	
 }
+
